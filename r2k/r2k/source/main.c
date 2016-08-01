@@ -53,7 +53,7 @@ PVOID GetKernelBase(OUT PULONG pSize) {
 	pMods = (PRTL_PROCESS_MODULES)ExAllocatePoolWithTag (NonPagedPool, bytes, 'domP');
 	RtlZeroMemory (pMods, bytes);
 	status = ZwQuerySystemInformation (SystemModuleInformation, pMods, bytes, &bytes);
-	if (NT_SUCCESS(status)) {
+	if (NT_SUCCESS (status)) {
 		PRTL_PROCESS_MODULE_INFORMATION pMod = pMods->Modules;
 		for (i = 0; i < pMods->NumberOfModules; i++) {
 			if (checkPtr >= pMod[i].ImageBase &&
@@ -209,7 +209,7 @@ NTSTATUS OnDriverDeviceControl(IN PDEVICE_OBJECT DeviceObject,IN PIRP Irp) {
 			DbgPrint ("[R2K] IOCTL_READ_KERNEL_MEM ERROR: exception code 0x%X\n", Status);
 			break;
 		}
-		if (NT_SUCCESS(Status)) {
+		if (NT_SUCCESS (Status)) {
 			dwBytesWritten = len;
 		}
 		break;
@@ -251,7 +251,7 @@ NTSTATUS OnDriverDeviceControl(IN PDEVICE_OBJECT DeviceObject,IN PIRP Irp) {
 			DbgPrint ("[R2K] IOCTL_READ_PHYS_MEM ERROR: exception code 0x%X\n", Status);
 			break;
 		}
-		if (NT_SUCCESS(Status)) {
+		if (NT_SUCCESS (Status)) {
 			DbgPrint ("[R2K] IOCTL_READ_PHYS_MEM Contents:\n");
 			//DumpBuffer((unsigned char *)pOutBuf, min(len, 0x100));
 			dwBytesWritten = len;
@@ -341,7 +341,7 @@ VOID onDriverUnload(IN PDRIVER_OBJECT DriverObject) {
 	DbgPrint ("[R2K] onDriverUnload \n");
 	RtlInitUnicodeString (&DosDeviceName, DOS_DEVICE_NAME);
 	Status = IoDeleteSymbolicLink (&DosDeviceName);
-	if (!NT_SUCCESS(Status)) {
+	if (!NT_SUCCESS (Status)) {
 		DbgPrint ("[R2K] Error: IoDeleteSymbolicLink failed\n");
 	}
 	if (DriverObject->DeviceObject) {
@@ -376,13 +376,13 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 	UNREFERENCED_PARAMETER (RegistryPath);
 	RtlInitUnicodeString (&DeviceName, NT_DEVICE_NAME);
 	Status = IoCreateDeviceSecure (DriverObject, 0, &DeviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &SDDL_DEVOBJ_SYS_ALL_ADM_ALL, NULL, &DeviceObject);
-	if (!NT_SUCCESS(Status)) {
+	if (!NT_SUCCESS (Status)) {
 		DbgPrint ("[R2K] Error: IoCreateDeviceSecure failed (status = %d)\n", Status);
 		return Status;
 	}
 	RtlInitUnicodeString (&DosDeviceName, DOS_DEVICE_NAME);
 	Status = IoCreateSymbolicLink (&DosDeviceName, &DeviceName);
-	if (!NT_SUCCESS(Status)) {
+	if (!NT_SUCCESS (Status)) {
 		DbgPrint ("[R2K] Error:  IoCreateSymbolicLink failed (status = %d)\n", Status);
 		if (DeviceObject) {
 			IoDeleteDevice (DeviceObject);
